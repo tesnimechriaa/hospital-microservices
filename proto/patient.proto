@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package patient;
+
+service PatientService {
+  rpc GetPatient (PatientRequest) returns (PatientResponse);
+  rpc CreatePatient (CreatePatientRequest) returns (PatientResponse);
+  rpc ListPatients (Empty) returns (PatientListResponse);
+  rpc DeletePatient (PatientRequest) returns (Empty);
+}
+
+message Empty {}
+
+message PatientRequest {
+  string id = 1;
+}
+
+message CreatePatientRequest {
+  string nom = 1;
+  string prenom = 2;
+  string date_naissance = 3;
+  string cin = 4;
+  string groupe_sanguin = 5;
+  string allergies = 6;
+}
+
+message PatientResponse {
+  string id = 1;
+  string nom = 2;
+  string prenom = 3;
+  string date_naissance = 4;
+  string cin = 5;
+  string groupe_sanguin = 6;
+  string allergies = 7;
+}
+
+message PatientListResponse {
+  repeated PatientResponse patients = 1;
+}

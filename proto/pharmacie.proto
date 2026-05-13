@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package pharmacie;
+
+service PharmacieService {
+  rpc CreateOrdonnance (CreateOrdoRequest) returns (OrdoResponse);
+  rpc GetOrdonnance (OrdoRequest) returns (OrdoResponse);
+  rpc DelivrerOrdonnance (OrdoRequest) returns (OrdoResponse);
+  rpc ListOrdonnances (PatientRequest) returns (OrdoListResponse);
+}
+
+message OrdoRequest {
+  string id = 1;
+}
+
+message PatientRequest {
+  string patient_id = 1;
+}
+
+message CreateOrdoRequest {
+  string patient_id = 1;
+  string rdv_id = 2;
+  string medicaments = 3;
+}
+
+message OrdoResponse {
+  string id = 1;
+  string patient_id = 2;
+  string rdv_id = 3;
+  string medicaments = 4;
+  string statut = 5;
+  string date_emission = 6;
+}
+
+message OrdoListResponse {
+  repeated OrdoResponse ordonnances = 1;
+}

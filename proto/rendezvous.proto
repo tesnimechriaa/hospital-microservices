@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package rendezvous;
+
+service RendezVousService {
+  rpc CreateRendezVous (CreateRDVRequest) returns (RDVResponse);
+  rpc GetRendezVous (RDVRequest) returns (RDVResponse);
+  rpc ListRendezVous (PatientRequest) returns (RDVListResponse);
+  rpc UpdateStatut (UpdateStatutRequest) returns (RDVResponse);
+  rpc DeleteRendezVous (RDVRequest) returns (Empty);
+}
+
+message Empty {}
+
+message RDVRequest {
+  string id = 1;
+}
+
+message PatientRequest {
+  string patient_id = 1;
+}
+
+message CreateRDVRequest {
+  string patient_id = 1;
+  string medecin = 2;
+  string date_heure = 3;
+  string motif = 4;
+}
+
+message UpdateStatutRequest {
+  string id = 1;
+  string statut = 2;
+}
+
+message RDVResponse {
+  string id = 1;
+  string patient_id = 2;
+  string medecin = 3;
+  string date_heure = 4;
+  string motif = 5;
+  string statut = 6;
+}
+
+message RDVListResponse {
+  repeated RDVResponse rendezvous = 1;
+}
