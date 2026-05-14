@@ -1,0 +1,269 @@
+{
+  "info": {
+    "_postman_id": "1f6de162-3edb-4d11-830b-3085fa565d36",
+    "name": "Hospital Microservices",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54384217",
+    "_collection_link": "https://go.postman.co/collection/54384217-1f6de162-3edb-4d11-830b-3085fa565d36?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01 - Créer Patient",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"nom\": \"Ben Ali\",\r\n  \"prenom\": \"Mohamed\",\r\n  \"date_naissance\": \"1990-05-15\",\r\n  \"cin\": \"12345678\",\r\n  \"groupe_sanguin\": \"A+\",\r\n  \"allergies\": \"pénicilline\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/patients",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "patients"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 - Lister Patients",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/patients",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "patients"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 - Détail Patient",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/patients/03ed8416-666f-4ecb-a171-dd04e753784e",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "patients",
+            "03ed8416-666f-4ecb-a171-dd04e753784e"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Créer Rendez-vous",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"patient_id\": \"03ed8416-666f-4ecb-a171-dd04e753784e\",\r\n  \"medecin\": \"Dr. Ben Salem\",\r\n  \"date_heure\": \"2026-05-20 10:00\",\r\n  \"motif\": \"Consultation générale\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/rendezvous",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "rendezvous"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Confirmer Rendez-vous",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"statut\": \"confirme\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/rendezvous/abea0442-cf44-4001-ae94-1aea7950bdd6/statut",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "rendezvous",
+            "abea0442-cf44-4001-ae94-1aea7950bdd6",
+            "statut"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 - Créer Ordonnance",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"patient_id\": \"03ed8416-666f-4ecb-a171-dd04e753784e\",\r\n  \"rdv_id\": \"abea0442-cf44-4001-ae94-1aea7950bdd6\",\r\n  \"medicaments\": \"Amoxicilline 500mg, Paracétamol 1g\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/ordonnances",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "ordonnances"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 - Délivrer Ordonnance",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/ordonnances/01e6e393-ba50-47eb-923f-60255341a2ae/delivrer",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "ordonnances",
+            "01e6e393-ba50-47eb-923f-60255341a2ae",
+            "delivrer"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 - GraphQL Patients",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"query\": \"{ patients { id nom prenom groupe_sanguin allergies } }\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09 - GraphQL Rendez-vous",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"query\": \"{ rendezvousByPatient(patient_id: \\\"03ed8416-666f-4ecb-a171-dd04e753784e\\\") { id medecin date_heure statut } }\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/graphql",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10 - Supprimer Patient",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/patients/03ed8416-666f-4ecb-a171-dd04e753784e",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "patients",
+            "03ed8416-666f-4ecb-a171-dd04e753784e"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
