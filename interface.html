@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Système Hospitalier Intelligent</title>
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4aa;
+    --accent2: #0088ff;
+    --text: #e8edf5;
+    --text2: #7a8ba0;
+    --error: #ff6b6b;
+    --warning: #ffb347;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .logo h1 { font-size: 22px; color: var(--accent); }
+  .logo span { font-size: 12px; color: var(--text2); }
+
+  .status-bar { display: flex; gap: 20px; }
+
+  .status-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+  .tabs {
+    display: flex; gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+    margin-bottom: 28px;
+  }
+
+  .tab {
+    flex: 1; padding: 12px 16px;
+    border: none; background: transparent;
+    color: var(--text2); font-size: 14px; font-weight: 600;
+    border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); background: var(--surface2); }
+  .tab.active { background: var(--accent); color: #000; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .section-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .section-subtitle { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 15px; font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-group { margin-bottom: 12px; }
+
+  label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text2); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 5px;
+  }
+
+  input, select, textarea {
+    width: 100%; padding: 10px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    padding: 10px 18px; border: none;
+    border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    width: 100%; margin-top: 4px;
+  }
+
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-small {
+    background: rgba(0,212,170,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(0,212,170,0.3);
+    width: auto; padding: 6px 14px; font-size: 12px;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  .response-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px;
+    font-family: monospace; font-size: 12px;
+    color: var(--accent); min-height: 70px;
+    max-height: 180px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-all;
+    margin-top: 8px;
+  }
+
+  .response-box.error { color: var(--error); border-color: rgba(255,107,107,0.3); }
+
+  .kafka-log {
+    background: var(--surface2);
+    border: 1px solid rgba(255,179,71,0.3);
+    border-radius: 8px; padding: 12px;
+    font-family: monospace; font-size: 12px;
+    color: var(--warning); min-height: 60px;
+    max-height: 130px; overflow-y: auto; margin-top: 8px;
+  }
+
+  .table-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; margin-top: 20px;
+  }
+
+  .table-header {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .table-title { font-size: 14px; font-weight: 700; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    padding: 10px 14px; text-align: left;
+    font-size: 11px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; background: rgba(0,0,0,0.2);
+  }
+
+  td { padding: 11px 14px; font-size: 13px; border-top: 1px solid var(--border); }
+  tr:hover td { background: rgba(0,212,170,0.03); }
+
+  .badge {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+
+  .badge-red { background: rgba(255,107,107,0.15); color: var(--error); }
+
+  .id-small {
+    font-family: monospace; font-size: 11px;
+    color: var(--text2); background: var(--surface2);
+    padding: 2px 6px; border-radius: 4px;
+  }
+
+  .notif {
+    position: fixed; bottom: 24px; right: 24px;
+    padding: 12px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; z-index: 1000;
+    transform: translateY(80px); opacity: 0; transition: all 0.3s;
+  }
+
+  .notif.show { transform: translateY(0); opacity: 1; }
+  .notif.success { background: rgba(0,212,170,0.2); border: 1px solid var(--accent); color: var(--accent); }
+  .notif.error { background: rgba(255,107,107,0.2); border: 1px solid var(--error); color: var(--error); }
+
+  .empty-state { text-align: center; padding: 36px; color: var(--text2); font-size: 14px; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    header { padding: 14px 16px; flex-direction: column; gap: 10px; }
+    .container { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <h1>Systeme Hospitalier Intelligent</h1>
+    <span>Architecture Microservices — Node.js + gRPC + Kafka + GraphQL</span>
+  </div>
+  <div class="status-bar">
+    <div class="status-dot"><span class="dot"></span> API Gateway :3000</div>
+    <div class="status-dot"><span class="dot"></span> Kafka :9092</div>
+    <div class="status-dot"><span class="dot"></span> gRPC actif</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('patients', this)">Patients</button>
+    <button class="tab" onclick="switchTab('rendezvous', this)">Rendez-vous</button>
+    <button class="tab" onclick="switchTab('pharmacie', this)">Pharmacie</button>
+    <button class="tab" onclick="switchTab('graphql', this)">GraphQL</button>
+  </div>
+
+  <!-- PATIENTS -->
+  <div id="panel-patients" class="panel active">
+    <div class="section-title">Gestion des Patients</div>
+    <div class="section-subtitle">Creer, consulter et gerer les dossiers medicaux — Base SQLite3</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Nouveau Patient</div>
+        <div class="form-group"><label>Nom</label><input type="text" id="p-nom" placeholder="Ben Ali"></div>
+        <div class="form-group"><label>Prenom</label><input type="text" id="p-prenom" placeholder="Mohamed"></div>
+        <div class="form-group"><label>Date de naissance</label><input type="date" id="p-dob"></div>
+        <div class="form-group"><label>CIN</label><input type="text" id="p-cin" placeholder="12345678"></div>
+        <div class="form-group">
+          <label>Groupe sanguin</label>
+          <select id="p-groupe">
+            <option value="">Selectionner...</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Allergies</label><input type="text" id="p-allergies" placeholder="penicilline, aspirine..."></div>
+        <button class="btn btn-primary" onclick="creerPatient()">Creer Patient</button>
+        <div class="response-box" id="resp-create-patient">En attente...</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Rechercher / Supprimer Patient</div>
+        <div class="form-group"><label>ID du patient</label><input type="text" id="p-search-id" placeholder="Colle l'ID ici..."></div>
+        <button class="btn btn-primary" onclick="rechercherPatient()">Rechercher</button>
+        <div class="response-box" id="resp-get-patient">En attente...</div>
+        <div class="divider"></div>
+        <div class="form-group"><label>ID a supprimer</label><input type="text" id="p-delete-id" placeholder="ID du patient..."></div>
+        <button class="btn btn-primary" style="background:#ff6b6b;color:#fff;" onclick="supprimerPatient()">Supprimer Patient</button>
+        <div class="response-box" id="resp-delete-patient">En attente...</div>
+      </div>
+    </div>
+    <div class="table-container">
+      <div class="table-header">
+        <div class="table-title">Liste des Patients</div>
+        <button class="btn btn-small" onclick="listerPatients()">Actualiser</button>
+      </div>
+      <div id="patients-table"><div class="empty-state">Cliquez sur Actualiser pour charger les patients</div></div>
+    </div>
+  </div>
+
+  <!-- RENDEZ-VOUS -->
+  <div id="panel-rendezvous" class="panel">
+    <div class="section-title">Gestion des Rendez-vous</div>
+    <div class="section-subtitle">Planifier et confirmer les consultations — Base SQLite3 + Kafka</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Nouveau Rendez-vous</div>
+        <div class="form-group"><label>ID Patient</label><input type="text" id="rdv-patient-id" placeholder="ID du patient..."></div>
+        <div class="form-group"><label>Medecin</label><input type="text" id="rdv-medecin" placeholder="Dr. Ben Salem"></div>
+        <div class="form-group"><label>Date et heure</label><input type="datetime-local" id="rdv-date"></div>
+        <div class="form-group"><label>Motif</label><input type="text" id="rdv-motif" placeholder="Consultation generale"></div>
+        <button class="btn btn-primary" onclick="creerRDV()">Creer Rendez-vous</button>
+        <div class="response-box" id="resp-create-rdv">En attente...</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Confirmer / Modifier Statut</div>
+        <div class="form-group"><label>ID du RDV</label><input type="text" id="rdv-update-id" placeholder="ID du rendez-vous..."></div>
+        <div class="form-group">
+          <label>Nouveau statut</label>
+          <select id="rdv-statut">
+            <option value="confirme">Confirme</option>
+            <option value="annule">Annule</option>
+            <option value="planifie">Planifie</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="updateRDV()">Mettre a jour</button>
+        <div class="response-box" id="resp-update-rdv">En attente...</div>
+        <div class="divider"></div>
+        <label>Evenement Kafka — rdv.confirme</label>
+        <div class="kafka-log" id="kafka-log">En attente d'un RDV confirme...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHARMACIE -->
+  <div id="panel-pharmacie" class="panel">
+    <div class="section-title">Gestion de la Pharmacie</div>
+    <div class="section-subtitle">Creer et delivrer les ordonnances — Base RxDB (NoSQL)</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Nouvelle Ordonnance</div>
+        <div class="form-group"><label>ID Patient</label><input type="text" id="ordo-patient-id" placeholder="ID du patient..."></div>
+        <div class="form-group"><label>ID Rendez-vous</label><input type="text" id="ordo-rdv-id" placeholder="ID du RDV..."></div>
+        <div class="form-group"><label>Medicaments</label><textarea id="ordo-medicaments" placeholder="Amoxicilline 500mg, Paracetamol 1g..."></textarea></div>
+        <button class="btn btn-primary" onclick="creerOrdonnance()">Creer Ordonnance</button>
+        <div class="response-box" id="resp-create-ordo">En attente...</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Delivrer / Consulter Ordonnance</div>
+        <div class="form-group"><label>ID Ordonnance — Delivrer</label><input type="text" id="ordo-deliver-id" placeholder="ID de l'ordonnance..."></div>
+        <button class="btn btn-primary" onclick="delivrerOrdonnance()">Delivrer Ordonnance</button>
+        <div class="response-box" id="resp-deliver-ordo">En attente...</div>
+        <div class="divider"></div>
+        <div class="form-group"><label>ID Ordonnance — Consulter</label><input type="text" id="ordo-get-id" placeholder="ID de l'ordonnance..."></div>
+        <button class="btn btn-primary" onclick="getOrdonnance()">Consulter Ordonnance</button>
+        <div class="response-box" id="resp-get-ordo">En attente...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAPHQL -->
+  <div id="panel-graphql" class="panel">
+    <div class="section-title">Requetes GraphQL</div>
+    <div class="section-subtitle">Demandez exactement les champs dont vous avez besoin</div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Tous les Patients</div>
+        <div class="response-box" style="color:var(--text2);font-size:11px;margin-bottom:10px;">{ patients { id nom prenom groupe_sanguin allergies } }</div>
+        <button class="btn btn-primary" onclick="gqlPatients()">Executer</button>
+        <div class="response-box" id="resp-gql-patients">En attente...</div>
+      </div>
+      <div class="card">
+        <div class="card-title">RDV par Patient</div>
+        <div class="form-group"><label>ID Patient</label><input type="text" id="gql-patient-id" placeholder="ID du patient..."></div>
+        <button class="btn btn-primary" onclick="gqlRDV()">Executer</button>
+        <div class="response-box" id="resp-gql-rdv">En attente...</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Ordonnances par Patient</div>
+        <div class="form-group"><label>ID Patient</label><input type="text" id="gql-ordo-patient-id" placeholder="ID du patient..."></div>
+        <button class="btn btn-primary" onclick="gqlOrdonnances()">Executer</button>
+        <div class="response-box" id="resp-gql-ordo">En attente...</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">Requete personnalisee</div>
+      <div class="form-group">
+        <label>Votre requete GraphQL</label>
+        <textarea id="gql-custom" placeholder='{ patient(id: "xxx") { nom allergies } }'></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="gqlCustom()">Executer</button>
+      <div class="response-box" id="resp-gql-custom">En attente...</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+  const API = 'http://localhost:3000';
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function showNotif(msg, type = 'success') {
+    const n = document.getElementById('notif');
+    n.textContent = msg;
+    n.className = 'notif ' + type + ' show';
+    setTimeout(() => n.classList.remove('show'), 3000);
+  }
+
+  function showResp(id, data, isError = false) {
+    const el = document.getElementById(id);
+    el.textContent = JSON.stringify(data, null, 2);
+    el.className = 'response-box' + (isError ? ' error' : '');
+  }
+
+  async function apiCall(method, url, body = null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API + url, opts);
+    return await res.json();
+  }
+
+  async function creerPatient() {
+    try {
+      const data = await apiCall('POST', '/api/patients', {
+        nom: document.getElementById('p-nom').value,
+        prenom: document.getElementById('p-prenom').value,
+        date_naissance: document.getElementById('p-dob').value,
+        cin: document.getElementById('p-cin').value,
+        groupe_sanguin: document.getElementById('p-groupe').value,
+        allergies: document.getElementById('p-allergies').value
+      });
+      showResp('resp-create-patient', data);
+      showNotif('Patient cree avec succes !');
+      listerPatients();
+    } catch(e) {
+      showResp('resp-create-patient', { error: e.message }, true);
+      showNotif('Erreur de connexion', 'error');
+    }
+  }
+
+  async function rechercherPatient() {
+    try {
+      const data = await apiCall('GET', '/api/patients/' + document.getElementById('p-search-id').value);
+      showResp('resp-get-patient', data);
+    } catch(e) { showResp('resp-get-patient', { error: e.message }, true); }
+  }
+
+  async function supprimerPatient() {
+    try {
+      const data = await apiCall('DELETE', '/api/patients/' + document.getElementById('p-delete-id').value);
+      showResp('resp-delete-patient', data);
+      showNotif('Patient supprime');
+      listerPatients();
+    } catch(e) {
+      showResp('resp-delete-patient', { error: e.message }, true);
+      showNotif('Erreur', 'error');
+    }
+  }
+
+  async function listerPatients() {
+    try {
+      const patients = await apiCall('GET', '/api/patients');
+      const container = document.getElementById('patients-table');
+      if (!patients || !patients.length) {
+        container.innerHTML = '<div class="empty-state">Aucun patient trouve</div>';
+        return;
+      }
+      container.innerHTML = `
+        <table>
+          <thead><tr><th>ID</th><th>Nom</th><th>Prenom</th><th>Groupe</th><th>Allergies</th><th>Action</th></tr></thead>
+          <tbody>
+            ${patients.map(p => `
+              <tr>
+                <td><span class="id-small">${p.id.substring(0,8)}...</span></td>
+                <td><strong>${p.nom}</strong></td>
+                <td>${p.prenom}</td>
+                <td><span class="badge badge-red">${p.groupe_sanguin || '-'}</span></td>
+                <td>${p.allergies || '-'}</td>
+                <td><button class="btn btn-small" onclick="copyId('${p.id}')">Copier ID</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+    } catch(e) {
+      document.getElementById('patients-table').innerHTML = '<div class="empty-state">Erreur — verifiez que les services tournent</div>';
+    }
+  }
+
+  async function creerRDV() {
+    try {
+      const data = await apiCall('POST', '/api/rendezvous', {
+        patient_id: document.getElementById('rdv-patient-id').value,
+        medecin: document.getElementById('rdv-medecin').value,
+        date_heure: document.getElementById('rdv-date').value.replace('T', ' '),
+        motif: document.getElementById('rdv-motif').value
+      });
+      showResp('resp-create-rdv', data);
+      showNotif('Rendez-vous cree !');
+    } catch(e) {
+      showResp('resp-create-rdv', { error: e.message }, true);
+      showNotif('Erreur', 'error');
+    }
+  }
+
+  async function updateRDV() {
+    try {
+      const id = document.getElementById('rdv-update-id').value;
+      const statut = document.getElementById('rdv-statut').value;
+      const data = await apiCall('PUT', `/api/rendezvous/${id}/statut`, { statut });
+      showResp('resp-update-rdv', data);
+      if (statut === 'confirme') {
+        document.getElementById('kafka-log').textContent =
+          `[${new Date().toLocaleTimeString()}] Evenement Kafka envoye !\nTopic: rdv.confirme\nPatient ID: ${data.patient_id}\nMedecin: ${data.medecin}\n>> MS Pharmacie notifie automatiquement !`;
+        showNotif('RDV confirme — Kafka a notifie la pharmacie !');
+      } else {
+        showNotif('Statut mis a jour');
+      }
+    } catch(e) {
+      showResp('resp-update-rdv', { error: e.message }, true);
+      showNotif('Erreur', 'error');
+    }
+  }
+
+  async function creerOrdonnance() {
+    try {
+      const data = await apiCall('POST', '/api/ordonnances', {
+        patient_id: document.getElementById('ordo-patient-id').value,
+        rdv_id: document.getElementById('ordo-rdv-id').value,
+        medicaments: document.getElementById('ordo-medicaments').value
+      });
+      showResp('resp-create-ordo', data);
+      showNotif('Ordonnance creee !');
+    } catch(e) {
+      showResp('resp-create-ordo', { error: e.message }, true);
+      showNotif('Erreur', 'error');
+    }
+  }
+
+  async function delivrerOrdonnance() {
+    try {
+      const data = await apiCall('PUT', `/api/ordonnances/${document.getElementById('ordo-deliver-id').value}/delivrer`);
+      showResp('resp-deliver-ordo', data);
+      showNotif('Ordonnance delivree !');
+    } catch(e) {
+      showResp('resp-deliver-ordo', { error: e.message }, true);
+      showNotif('Erreur', 'error');
+    }
+  }
+
+  async function getOrdonnance() {
+    try {
+      const data = await apiCall('GET', `/api/ordonnances/${document.getElementById('ordo-get-id').value}`);
+      showResp('resp-get-ordo', data);
+    } catch(e) { showResp('resp-get-ordo', { error: e.message }, true); }
+  }
+
+  async function gqlQuery(query, respId) {
+    try {
+      const res = await fetch(API + '/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      showResp(respId, await res.json());
+    } catch(e) { showResp(respId, { error: e.message }, true); }
+  }
+
+  function gqlPatients() { gqlQuery('{ patients { id nom prenom groupe_sanguin allergies } }', 'resp-gql-patients'); }
+  function gqlRDV() { gqlQuery(`{ rendezvousByPatient(patient_id: "${document.getElementById('gql-patient-id').value}") { id medecin date_heure statut } }`, 'resp-gql-rdv'); }
+  function gqlOrdonnances() { gqlQuery(`{ ordonnancesByPatient(patient_id: "${document.getElementById('gql-ordo-patient-id').value}") { id medicaments statut date_emission } }`, 'resp-gql-ordo'); }
+  function gqlCustom() { gqlQuery(document.getElementById('gql-custom').value, 'resp-gql-custom'); }
+
+  function copyId(id) {
+    navigator.clipboard.writeText(id);
+    showNotif('ID copie !');
+  }
+
+  listerPatients();
+</script>
+</body>
+</html>
